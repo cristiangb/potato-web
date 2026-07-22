@@ -65,6 +65,7 @@ async function boot() {
         const first = await loadLevel(levels[0]);
         startLevel(first);
       });
+      window.currentGame = currentGame;
       currentGame.start();
     };
     startLevel(level);

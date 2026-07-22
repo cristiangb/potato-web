@@ -60,6 +60,7 @@ class PotatoGame {
     this.spawnX = 160; this.spawnY = 160;
     this.player = new Player(this.spawnX, this.spawnY);
     this.onGameOver = onGameOver;
+    this.touchJump = false; // pulso de salto disparado por doble-tap en mobile
     this.keys = {};
     this.onExit = onExit;
     window.addEventListener('keydown', e => this.keys[e.code] = true);
@@ -88,11 +89,11 @@ class PotatoGame {
         p.animacion = 0;
         if (k['ArrowRight'] || k['ArrowLeft']) p.estado = ESTADO.CAMINA;
         if (k['ArrowDown'] && (k['ArrowRight'] || k['ArrowLeft'])) p.estado = ESTADO.CORRIDA;
-        if (k['ArrowUp']) { p.sal = 0; p.estado = ESTADO.SALTO; }
+        if (k['ArrowUp'] || this.touchJump) { p.sal = 0; p.estado = ESTADO.SALTO; }
         if (!pisandoAbajo) { p.sal = 26; p.animacion = 15; p.estado = ESTADO.SALTO; }
         break;
       case ESTADO.CAMINA:
-        if (k['ArrowUp']) { p.sal = 0; p.estado = ESTADO.SALTO; p.animacion = 0; break; }
+        if (k['ArrowUp'] || this.touchJump) { p.sal = 0; p.estado = ESTADO.SALTO; p.animacion = 0; break; }
         if (k['ArrowRight'] && !solid(pa.R_U)) {
           p.lado = LADO.DERECHO;
           p.animacion = (p.animacion + 1) % CAMIN_TABLE.length;
@@ -105,7 +106,7 @@ class PotatoGame {
         if (!pisandoAbajo) { p.sal = 25; p.animacion = 15; p.estado = ESTADO.SALTO; }
         break;
       case ESTADO.CORRIDA:
-        if (k['ArrowUp']) { p.sal = 0; p.estado = ESTADO.SALTO; p.animacion = 0; break; }
+        if (k['ArrowUp'] || this.touchJump) { p.sal = 0; p.estado = ESTADO.SALTO; p.animacion = 0; break; }
         if (k['ArrowRight'] && !solid(pa.R_U)) {
           p.lado = LADO.DERECHO;
           p.animacion = (p.animacion + 1) % CORRID_TABLE.length;
@@ -172,6 +173,8 @@ class PotatoGame {
         if (this.onGameOver) this.onGameOver();
       }
     }
+
+    this.touchJump = false; // el pulso de doble-tap dura un solo tick de lógica
   }
 
   render() {
